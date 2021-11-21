@@ -1,0 +1,34 @@
+class Hash
+  def slice(*keep_keys)
+    h = {}
+    keep_keys.each { |key| h[key] = fetch(key) if has_key?(key) }
+    h
+  end unless Hash.method_defined?(:slice)
+  def except(*less_keys)
+    slice(*keys - less_keys)
+  end unless Hash.method_defined?(:except)
+end
+
+require 'vagrant-aws'
+
+Vagrant.configure("2") do |config|
+  config.vm.box = 'aws-dummy'
+  
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.provider 'aws' do |aws, override|
+    aws.block_device_mapping = [{ 'DeviceName' => '/dev/sda1', 'Ebs.VolumeSize' => 50 }]
+    aws.access_key_id = "ASIA6PBUHJTNWXZYOP6X"
+    aws.secret_access_key = "lQLSNGV+zYpcLg8wOpvIxHyTVyb92ObW7iXWRueg"
+    aws.session_token = "FwoGZXIvYXdzEGEaDItUt3YJiQbojMsJLSLVAZrKf4ynja9oUfCaE193vgfZJkQq5pOQ58HpVPIFpm5PUwhA1vPoM6izZs0NhNRKRsE0WIGS2jftdT2gBj/Pa3GxL0enAERBjoeMM78TfvRR3P+kUrkYgh9qOGbRNKDgZpIBiuYDkBRacE3SM/1GUDS5E0H1K2g7YgMYhaWUXX6eKwWGqZvh8wh2y+NDl7gToaiG4J7v0jz4gN2Tjx+uxuy2yUKF6daMLxgPxZNCugSl1Q24zK4ZvyE23BnEywKAaS2YsnTpc7qm0ZFdYZG0zgi+DqiSSyjIxemMBjItp58P7nWOkwcRPEjQmN9/oantdR+glHymJkwOSmLRGkHJqsEPr5jErlw7yhzw"
+    aws.keypair_name = "vockey"
+    aws.ami = "ami-0be31e3c191012ba1"
+    aws.region = "us-east-1"
+    aws.instance_type = "t2.micro"
+    aws.security_groups = ['default']
+    aws.elastic_ip = "3.229.239.181"
+
+    override.ssh.username = "ubuntu"
+    override.ssh.private_key_path = "labsuser.pem"
+  end
+end
